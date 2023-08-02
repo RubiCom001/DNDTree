@@ -1,35 +1,36 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { ControlledTreeEnvironment , Tree, TreeItemIndex } from 'react-complex-tree';
+import { longTree } from "./data";
+import { loadTree } from './data2';
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
-
+  const [focusedItem, setFocusedItem] = useState<TreeItemIndex>();
+  const [expandedItems, setExpandedItems] = useState<TreeItemIndex[]>([]);
+  const [selectedItems, setSelectedItems] = useState<TreeItemIndex[]>([]);
+  const jitems = loadTree(); 
+  console.log(JSON.stringify(longTree.items, null, 2));
+  console.log(JSON.stringify(jitems, null, 2));
+  console.log("expanded: ", expandedItems);
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <ControlledTreeEnvironment
+      items={jitems}
+      getItemTitle={item => item.data?.Name}
+      viewState={{
+        ['tree-2']: {
+          focusedItem,
+          expandedItems,
+          selectedItems,
+        },
+      }}
+      onFocusItem={item => setFocusedItem(item.index)}
+      onExpandItem={item => setExpandedItems([...expandedItems, item.index])}
+      onCollapseItem={item => setExpandedItems(expandedItems.filter(expandedItemIndex => expandedItemIndex !== item.index))}
+      onSelectItems={items => setSelectedItems(items)}
+    >
+      <Tree treeId="tree-2" rootItem="root" treeLabel="Tree Example" />
+    </ControlledTreeEnvironment>
+  );
 }
 
 export default App
